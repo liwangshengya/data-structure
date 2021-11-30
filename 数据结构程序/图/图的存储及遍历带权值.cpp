@@ -1,9 +1,10 @@
 #include<iostream>
 using namespace std;
 #include<queue>
+#include<stack>
 #define DataType int
-const int Max_VERTEXNUM = 20;
-const int MaxInt = 999;
+const int Max_VERTEXNUM = 20;//图的最大顶点数
+const int MaxInt = 999;//图的无穷大权值
 void cinijw(int& vi, int& vj, int& w)
 {
 	//cout << "请输入该边依附的顶点及信息:" << endl;
@@ -21,13 +22,14 @@ public:
 	AMGraph(DataType a[],int n,int e,ARc b[]);
 	~AMGraph();
 	void display();
-	void DFSTraverse(int v);
-	void BFSTraverse(int v);
+	void DFSTraverse(int v);//DFS递归
+	void DFSTraverse1(int v);//DFS非递归
+	void BFSTraverse(int v);//BFS
 private:
 	DataType vertex[Max_VERTEXNUM];
 	int arc[Max_VERTEXNUM][Max_VERTEXNUM];
 	int vertexNum, arcnum;
-	int LocateVex(DataType a)
+	int LocateVex(DataType a)//获得元素a在顶点数组中的位置
 	{
 		for (int i = 0; i < vertexNum; i++)
 		{
@@ -43,13 +45,13 @@ AMGraph::AMGraph(DataType a[],int n,int e,ARc b[])
 	arcnum = e;
 	for (int i = 0; i < vertexNum; i++)
 	{
-		vertex[i] = a[i];
+		vertex[i] = a[i];//顶点数组初始化
 	}
 	for (int i = 0; i < vertexNum; i++)
 	{
 		for (int j = 0; j < vertexNum; j++)
 		{
-			arc[i][j] =MaxInt;
+			arc[i][j] =MaxInt;//将邻接矩阵全部初始化为最大值
 		}
 	}
 	for (int i = 0; i < arcnum; i++)
@@ -60,7 +62,7 @@ AMGraph::AMGraph(DataType a[],int n,int e,ARc b[])
 		v = LocateVex(b[i].from);
 		r= LocateVex(b[i].to);
 		arc[v][r] = b[i].info;
-		arc[r][v] = b[i].info;
+		arc[r][v] = b[i].info;//将边输入到邻接矩阵
 	}
 }
 
@@ -97,11 +99,12 @@ void AMGraph::display()
 
 }
 
-void AMGraph::DFSTraverse(int v)
+void AMGraph::DFSTraverse(int v)//DFS递归遍历
 {
 	static int visited[Max_VERTEXNUM] = { 0 };
-	cout << vertex[v] << " ";
-	visited[v] = 1;
+	//初始化visited数组为0，注意此处的static
+	cout << vertex[v] << " ";//遍历v
+	visited[v] = 1;//将v标记为以访问
 	for (int i = 0; i < vertexNum; i++)
 	{
 		//cout << arc[v][i] << endl;
@@ -109,8 +112,38 @@ void AMGraph::DFSTraverse(int v)
 			DFSTraverse(i);
 	}
 }
+void AMGraph::DFSTraverse1(int v)
+{
+	int visited[Max_VERTEXNUM] = { 0 };//
+	cout << vertex[v] << " ";
+	visited[v] = 1;
+	stack<int> s;
+	s.push(v);
+	while (!s.empty())
+	{
+		int w, i;
+		w = s.top();
+		//s.pop();
+		for ( i = 0; i < vertexNum; i++)
+		{
+			if ((arc[w][i] != MaxInt) && (visited[i] == 0))
+			{
+				s.push(i);
+				cout << vertex[i] << " ";
+				visited[i] = 1;	
+				break;//深度优先
+			}
+		}
+		if(i==vertexNum)
+		{
+			s.pop();//如果i=vertexnum，与i相邻的结点都访问完了
+		}
+	}
 
-void AMGraph::BFSTraverse(int v)
+}
+
+
+void AMGraph::BFSTraverse(int v)//BFS遍历
 {
 	int visisted[Max_VERTEXNUM] = { 0 };//初始化visited数组
 	cout << vertex[v] << " ";//输出访问过的顶点信息
@@ -137,14 +170,16 @@ void AMGraph::BFSTraverse(int v)
 }
 
 
+//邻接表存储有向图
+//边表
 typedef struct arc {
-	int adjvex;
-	struct arc* next;
-	int info;
+	int adjvex;////邻接点域，顶点在定点表中的下标
+	struct arc* next;//指针域，指向边表的下一个结点
+	int info;//权值
 }ArcNode;
 typedef  struct vet {
-	DataType vertex;
-	ArcNode* firstEdge;
+	DataType vertex;//数据源
+	ArcNode* firstEdge;//指针域，指向边表中的第一个结点
 }VertexNode;
 
 
@@ -155,6 +190,7 @@ public:
 	void display();
 	void DFSTraverse(int v);
 	void BFSTraverse(int v);
+	void DFSTraverse1(int v);
 	~AlGraph();
 
 private:
@@ -228,6 +264,36 @@ void AlGraph::DFSTraverse(int v)
 		p = p->next;
 	}
 }
+void AlGraph::DFSTraverse1(int v)
+{
+	int visited[Max_VERTEXNUM] = { 0 };
+	cout << adjList[v].vertex << " ";
+	visited[v] = 1;
+	ArcNode* p = adjList[v].firstEdge;
+	stack<int> s;
+	s.push(v);
+	while (!s.empty())
+	{
+		int w;
+		w = s.top();
+		p = adjList[w].firstEdge;
+		while (p)
+		{
+			if (visited[p->adjvex] == 0)
+			{
+				cout << adjList[p->adjvex].vertex << " ";
+				visited[p->adjvex] = 1;
+				s.push(p->adjvex);
+				p = adjList[p->adjvex].firstEdge;
+			}
+			else
+			{
+				p = p->next;
+			}
+		}
+		s.pop();
+	}
+}
 
 void AlGraph::BFSTraverse(int v)
 {
@@ -280,63 +346,63 @@ void menu()
 	cout << " 3.退出" << endl;
 	cout << " 请输入你的 选择" << endl;
 }
-int main()
-{
-	int   a[Max_VERTEXNUM];
-	int n, e;
-	ARc ac[Max_VERTEXNUM];
-	cout << "请输入结点个数和边个数：" << endl;
-	cin >> n >> e;
-	cout << "请输入顶点" << endl;
-	for (int i = 0; i < n; i++)
-	{
-		cin >> a[i];
-	}
-	for (int i = 0; i < e; i++)
-	{
-		cout<< "请输入第" << i << "条边的顶点和信息" << endl;
-		cinijw(ac[i].from, ac[i].to, ac[i].info);
-	}
-	AMGraph m(a, n, e,ac);
-	AlGraph q(a, n, e,ac);
-	menu();
-	int i;
-	while (1)
-	{
-		menu();
-		cin >> i;
-		switch (i)
-		{
-		case 1:
-			m.display();
-			cout << " DFS" << endl;
-			m.DFSTraverse(0);
-			cout << endl;
-			cout << "BFS" << endl;
-			m.BFSTraverse(0);
-			cout << endl;
-			break;
-		case 2:
-			q.display();
-			cout << "DFS";
-			q.DFSTraverse(0);
-			cout << endl;
-			cout << "BFS";
-			q.BFSTraverse(0);
-			cout << endl;
-			break;
-		case 3:return 0;
-		default:
-			break;
-		}
+//int main()
+//{
+//	int   a[Max_VERTEXNUM];
+//	int n, e;
+//	ARc ac[Max_VERTEXNUM];
+//	cout << "请输入结点个数和边个数：" << endl;
+//	cin >> n >> e;
+//	cout << "请输入顶点" << endl;
+//	for (int i = 0; i < n; i++)
+//	{
+//		cin >> a[i];
+//	}
+//	for (int i = 0; i < e; i++)
+//	{
+//		cout<< "请输入第" << i << "条边的顶点和信息" << endl;
+//		cinijw(ac[i].from, ac[i].to, ac[i].info);
+//	}
+//	AMGraph m(a, n, e,ac);
+//	AlGraph q(a, n, e,ac);
+//	menu();
+//	int i;
+//	while (1)
+//	{
+//		menu();
+//		cin >> i;
+//		switch (i)
+//		{
+//		case 1:
+//			m.display();
+//			cout << " DFS" << endl;
+//			m.DFSTraverse(0);
+//			cout << endl;
+//			cout << "BFS" << endl;
+//			m.BFSTraverse(0);
+//			cout << endl;
+//			break;
+//		case 2:
+//			q.display();
+//			cout << "DFS";
+//			q.DFSTraverse(0);
+//			cout << endl;
+//			cout << "BFS";
+//			q.BFSTraverse(0);
+//			cout << endl;
+//			break;
+//		case 3:return 0;
+//		default:
+//			break;
+//		}
+//
+//
+//
+//	}
+//
+//
+//}
 
-
-
-	}
-
-
-}
-/*
 int main()
 {
 	int a[] = { 1,2,3,4,5 };
@@ -345,11 +411,11 @@ int main()
 	{	
 		cinijw(b[i].from, b[i].to, b[i].info);
 	}
-	AlGraph m(a, 5,4,b);
+	AMGraph m(a, 5,4,b);
 	m.display();
-	m.BFSTraverse(1);
+	m.DFSTraverse1(1);
 	m.DFSTraverse(1);
-}*/
+}
 
 
 /*请输入结点个数和边个数：
