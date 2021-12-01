@@ -5,8 +5,6 @@ from sklearn.linear_model import LinearRegression
 from  sklearn import metrics
 pizza=pd.read_csv("pizza.csv",index_col='ld')
 pizza.head()
-dia=pizza.loc[:,'Diameter'].values
-price=pizza.loc[:,'Price'].values
 #print(dia)
 #print(price)
 #dia_new=dia.T
