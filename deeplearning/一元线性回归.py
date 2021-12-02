@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 from  sklearn import metrics
-pizza=pd.read_csv("pizza.csv",index_col='ld')
+pizza=pd.read_csv(".pizza.csv",index_col='ld')
 pizza.head()
 #print(dia)
 #print(price)
@@ -14,8 +14,8 @@ print(price.shape)
 dia_new=np.mat(dia).reshape(-1,1)
 print(dia_new.shape)
 #打印散点图
-#plt.scatter(dia,price)
-#plt.show()
+plt.scatter(dia,price)
+plt.show()
 
 #将dia矩阵添加一个 为 1 的特征
 one_colum=np.ones((dia_new.shape[0],1))
